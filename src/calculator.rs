@@ -251,6 +251,10 @@ impl Application for Calculator {
             Message::Edit(element) => {
                 let mut owned_expression = self.expression.to_owned();
 
+                if owned_expression.eq("0") {
+                    owned_expression.pop();
+                }
+
                 owned_expression.push(element);
                 self.expression = owned_expression;
             },
