@@ -31,9 +31,9 @@ impl Operator {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub enum Token {
-    Number(u32),
+    Number(f32),
     Operator(Operator),
     Bracket(char),
 }
@@ -56,27 +56,33 @@ impl Calculator {
         let chars = expr.chars();
         let mut tokens: Vec<Token> = Vec::new();
         let mut parens = Vec::new(); 
+        let mut is_calculating_decimals: bool = false;
+        let mut decimal_place: f32 = 0.1;
 
         for c in chars {
             match c {
                 '0'..='9' => match tokens.last_mut() {
                     Some(Token::Number(n)) => {
-                        *n = *n * 10 + (c as u32 - 48);
+                        if is_calculating_decimals {
+                            *n += ((c as i32) as f32 - 48.0) * decimal_place;
+                            decimal_place *= 0.1;
+                        } else {
+                            *n = *n * 10.0 + ((c as i32) as f32 - 48.0);
+                        }
                     },
                     _ => {
-                        let digit = c as u32 - 48;
+                        let digit = (c as i32) as f32 - 48.0;
                         tokens.push(Token::Number(digit));
                     }
                 },
-                // '.' => match tokens.last_mut() {
-                //     Some(Token::Number(n)) => {
-                //         *n = *n * 10 + (c as f32 - 48.0); 
-                //     },
-                //     _ => return Err(Error::BadToken(c))
-                // },
+                '.' => {
+                    is_calculating_decimals = true;
+                    decimal_place = 0.1;
+                },
                 '(' => {
                     tokens.push(Token::Bracket('('));
                     parens.push(c);
+                    is_calculating_decimals = false;
                 },
                 ')' => {
                     tokens.push(Token::Bracket(')'));
@@ -87,13 +93,26 @@ impl Calculator {
                     } else {
                         return Err(Error::MismatchedParens);
                     }
+                    is_calculating_decimals = false;
                 },
-                '+' => tokens.push(Token::Operator(Operator::Add)),
-                '-' => tokens.push(Token::Operator(Operator::Sub)),
-                '*' => tokens.push(Token::Operator(Operator::Mul)),
-                '/' => tokens.push(Token::Operator(Operator::Div)),
-                ' ' => {},
-                '\n' => {},
+                '+' => {
+                    tokens.push(Token::Operator(Operator::Add));
+                    is_calculating_decimals = false;
+                },
+                '-' => {
+                    tokens.push(Token::Operator(Operator::Sub));
+                    is_calculating_decimals = false;
+                },
+                '*' => {
+                    tokens.push(Token::Operator(Operator::Mul));
+                    is_calculating_decimals = false;
+                },
+                '/' => {
+                    tokens.push(Token::Operator(Operator::Div));
+                    is_calculating_decimals = false;
+                },
+                ' ' => is_calculating_decimals = false,
+                '\n' => is_calculating_decimals = false,
                 _ => return Err(Error::BadToken(c))
             }
         }

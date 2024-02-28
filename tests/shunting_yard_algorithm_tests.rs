@@ -8,13 +8,41 @@ fn test_parser() {
     let tokens = tokens_result.unwrap();
 
     let expected_tokens = vec![
-        Token::Number(1), Token::Operator(Operator::Add),
-        Token::Number(2), Token::Operator(Operator::Mul),
-        Token::Bracket('('), Token::Number(3), 
-        Token::Operator(Operator::Sub), Token::Number(4), Token::Bracket(')')
+        Token::Number(1.0), Token::Operator(Operator::Add),
+        Token::Number(2.0), Token::Operator(Operator::Mul),
+        Token::Bracket('('), Token::Number(3.0), 
+        Token::Operator(Operator::Sub), Token::Number(4.0), Token::Bracket(')')
     ];
 
     assert_eq!(expected_tokens, tokens);    
+}
+
+#[test]
+fn test_parse_decimal() {
+    let tokens_result = crate::calculator::Calculator::parse("2.5");
+
+    let tokens = tokens_result.unwrap();
+
+    let expected_tokens = vec![
+        Token::Number(2.5)
+    ];
+
+    assert_eq!(expected_tokens, tokens)
+}
+
+// EXPRESSION: 2.5 
+// TOKEN | ACTION                        | QUEUE         | STACK
+#[test]
+fn test_parse_with_decimals() {
+    let tokens_result = crate::calculator::Calculator::parse("2.5 + 3.5");
+
+    let tokens = tokens_result.unwrap();
+
+    let expected_tokens = vec![
+        Token::Number(2.5), Token::Operator(Operator::Add), Token::Number(3.5)
+    ];
+
+    assert_eq!(expected_tokens, tokens)
 }
 
 // EXPRESSION: 1 + 2 * (3 - 4)
@@ -38,7 +66,7 @@ fn test_expression_queue() {
     let expression_queue = calculator::Calculator::expression(tokens_result.unwrap());
 
     let expected_queue: Vec<Token> = vec![
-        Token::Number(1), Token::Number(2), Token::Number(3), Token::Number(4),
+        Token::Number(1.0), Token::Number(2.0), Token::Number(3.0), Token::Number(4.0),
         Token::Operator(Operator::Sub), Token::Operator(Operator::Mul), Token::Operator(Operator::Add)
     ];
 
@@ -70,8 +98,8 @@ fn test_second_expression_queue() {
     let expression_queue = calculator::Calculator::expression(tokens_result.unwrap());
 
     let expected_queue: Vec<Token> = vec![
-        Token::Number(5), Token::Number(3), Token::Operator(Operator::Mul), Token::Number(8), Token::Number(2),
-        Token::Operator(Operator::Sub), Token::Number(4), Token::Operator(Operator::Div), Token::Operator(Operator::Add)
+        Token::Number(5.0), Token::Number(3.0), Token::Operator(Operator::Mul), Token::Number(8.0), Token::Number(2.0),
+        Token::Operator(Operator::Sub), Token::Number(4.0), Token::Operator(Operator::Div), Token::Operator(Operator::Add)
     ];
 
     assert_eq!(expression_queue, expected_queue)
@@ -101,8 +129,8 @@ fn test_third_expression_queue() {
     let expression_queue = calculator::Calculator::expression(tokens_result.unwrap());
 
     let expected_queue: Vec<Token> = vec![
-        Token::Number(4), Token::Number(4), Token::Number(2), Token::Operator(Operator::Mul), Token::Number(1),
-        Token::Number(5), Token::Operator(Operator::Sub), Token::Operator(Operator::Div), Token::Operator(Operator::Add)
+        Token::Number(4.0), Token::Number(4.0), Token::Number(2.0), Token::Operator(Operator::Mul), Token::Number(1.0),
+        Token::Number(5.0), Token::Operator(Operator::Sub), Token::Operator(Operator::Div), Token::Operator(Operator::Add)
     ];
 
     assert_eq!(expression_queue, expected_queue)
