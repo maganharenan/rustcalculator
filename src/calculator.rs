@@ -251,11 +251,22 @@ impl Application for Calculator {
             Message::Edit(element) => {
                 let mut owned_expression = self.expression.to_owned();
 
-                if owned_expression.eq("0") {
+                if owned_expression.eq("0") && element != '.' {
                     owned_expression.pop();
                 }
 
+                let last_char_in_expression = owned_expression.chars().last().unwrap_or('?');
+
+                if (element == '.' || element == '+' || element == '-' ||  element == '/' || element == '*' || element == ')') && !last_char_in_expression.is_numeric() {
+                    return Command::none()
+                }
+
+                if element == '(' && (last_char_in_expression.is_numeric() || last_char_in_expression == '.') {
+                    return Command::none()
+                }
+
                 owned_expression.push(element);
+
                 self.expression = owned_expression;
             },
             Message::Clear => {
