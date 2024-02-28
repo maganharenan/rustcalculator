@@ -207,11 +207,18 @@ impl Calculator {
         }
     }
 
-    pub fn resolve(expression: String) -> Option<f32> {
+    pub fn resolve(expression: String) -> Option<String> {
         let tokens = Calculator::parse(expression.to_owned());
         let expr = Calculator::expression(tokens.unwrap());
-
-        Calculator::evaluate(expr)
+        let result = Calculator::evaluate(expr)?;
+    
+        let result_string = if result.fract() == 0.0 {
+            format!("{:.0}", result)
+        } else {
+            format!("{:?}", result)
+        };
+    
+        Some(result_string)
     }
 
 }
@@ -251,7 +258,7 @@ impl Application for Calculator {
                 self.expression = String::new()
             },
             Message::Resolve => {
-                self.result = Calculator::resolve(self.expression.to_owned()).map(|value| format!("{:?}", value));
+                self.result = Calculator::resolve(self.expression.to_owned());
                 self.expression = self.result.clone().unwrap_or("".to_owned());
             },
         }
