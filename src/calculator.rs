@@ -221,6 +221,18 @@ impl Calculator {
         Some(result_string)
     }
 
+    pub fn count_char(char: char, expr: String) -> u32 {
+        let mut char_count: u32 = 0;
+
+        for c in expr.chars() {
+            if c == char {
+                char_count += 1;
+            }
+        }
+
+        return char_count
+    }
+
 }
 
 #[derive(Debug, Clone)]
@@ -257,11 +269,19 @@ impl Application for Calculator {
 
                 let last_char_in_expression = owned_expression.chars().last().unwrap_or('?');
 
-                if (element == '.' || element == '+' || element == '-' ||  element == '/' || element == '*' || element == ')') && !last_char_in_expression.is_numeric() {
+                if element == '.' && !last_char_in_expression.is_numeric() {
                     return Command::none()
                 }
 
-                if element == '(' && (last_char_in_expression.is_numeric() || last_char_in_expression == '.') {
+                if (element == '+' || element == '-' ||  element == '/' || element == '*') && (!last_char_in_expression.is_numeric() && last_char_in_expression != ')') {
+                    return Command::none()
+                }
+
+                if element == ')' && !last_char_in_expression.is_numeric() {
+                    return Command::none()
+                }
+
+                if element == '(' && (last_char_in_expression.is_numeric() || last_char_in_expression == '.' || last_char_in_expression == ')') {
                     return Command::none()
                 }
 
