@@ -38,6 +38,13 @@ pub fn test_sub_with_expression_new() {
 #[test]
 pub fn test_expression_with_float() {
     let result = calculator::Calculator::resolve("2.5 + 3.5".to_owned()).unwrap();
-    println!("{:?}", result);
-    assert_eq!(result, "6.0")
+
+    assert_eq!(result, "6")
+}
+
+#[test]
+pub fn test_expression_with_float_two() {
+    let result = calculator::Calculator::resolve("2.8 + 3.5".to_owned()).unwrap();
+    
+    assert_eq!(result, "6.3")
 }
